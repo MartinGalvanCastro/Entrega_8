@@ -1,11 +1,24 @@
 import { Given, When, Then, After } from "@cucumber/cucumber";
 import { expect } from "@playwright/test";
 import { IPlaywrightWorld, Browsers } from "../world";
+import path from "path";
 
 //Variables
 const adminPrefixUrl = "/ghost/#";
 let esTemaClaro: boolean | undefined;
 let tituloContenido: string | undefined;
+let nombreMetadata: string | undefined;
+let nombrePerfil: string | undefined;
+
+/** ************************
+ * HOOKS
+ * **************************/
+After(() => {
+  tituloContenido = undefined;
+  esTemaClaro = undefined;
+  nombreMetadata = undefined;
+  nombrePerfil = undefined;
+});
 
 /** *********************
  * GIVEN
@@ -48,6 +61,13 @@ When("Cambia el tema", async function (this: IPlaywrightWorld) {
 When(
   "Navega al menu de {string}",
   async function (this: IPlaywrightWorld, menu: string) {
+    if (menu === "user-profile") {
+      await this.page.locator("div.gh-user-avatar").click();
+      await this.page.waitForTimeout(500);
+    }
+    if (["page", "post"].includes(menu)) {
+      menu += "s";
+    }
     await this.page.locator(`a[data-test-nav="${menu}"]`).click();
   }
 );
@@ -58,6 +78,7 @@ When(
     this: IPlaywrightWorld,
     rol: "Contributor" | "Author" | "Editor" | "Administrator"
   ) {
+    await this.page.waitForTimeout(5 * 1000);
     const email = `${rol}-${this.dataGenerator.number.int({
       min: 100,
       max: 200,
@@ -82,8 +103,8 @@ When(
               email,
               expires: null,
               role_id: this.dataGenerator.string.uuid(),
-              status: null,
-              token: null,
+              status: "sent",
+              token: this.dataGenerator.string.uuid(),
             },
           ],
         },
@@ -100,6 +121,118 @@ When(
     await modal.getByRole("button", { name: "Send invitation now" }).click();
   }
 );
+
+When("Edita metadata de la pagina", async function (this: IPlaywrightWorld) {
+  nombreMetadata = this.dataGenerator.lorem.word();
+  const box = await this.page.locator('div[data-testid="metadata"]');
+  await box.getByText("Edit").click();
+  await this.page.keyboard.press("Control+A");
+  await this.page.keyboard.type(nombreMetadata);
+  await this.page.getByRole("button", { name: "save" }).click();
+});
+
+When(
+  "Filtra los usuarios por un nombre",
+  async function (this: IPlaywrightWorld) {
+    const correo = "Filtered Member";
+    await this.page
+      .locator('input[data-test-input="members-search"]')
+      .fill(correo);
+  }
+);
+
+When("Navega al dashboard", async function (this: IPlaywrightWorld) {
+  await this.page.goto(adminPrefixUrl);
+});
+
+When(
+  "Actualiza su informacion del perfil",
+  async function (this: IPlaywrightWorld) {
+    nombrePerfil = this.dataGenerator.person.fullName();
+    await this.page.getByLabel("Full name").fill(nombrePerfil);
+  }
+);
+
+When("Sube una cover image", async function (this: IPlaywrightWorld) {
+  const fileChooserPromise = this.page.waitForEvent("filechooser");
+  try {
+    await this.page
+      .getByText("Upload cover image")
+      .click({ timeout: 2 * 1000 });
+  } catch (e) {
+    await this.page
+      .getByText("Delete cover image")
+      .click({ timeout: 2 * 1000 });
+    await this.page.waitForTimeout(2 * 1000);
+    await this.page
+      .getByText("Upload cover image")
+      .click({ timeout: 2 * 1000 });
+  }
+
+  const fileChooser = await fileChooserPromise;
+  const img = this.dataGenerator.number.int({ min: 1, max: 3 });
+  await fileChooser.setFiles(path.join(__dirname, "..", "imgs", `${img}.jpeg`));
+  await this.page.waitForTimeout(5 * 1000);
+});
+
+When("Guarda los cambios del perfil", async function (this: IPlaywrightWorld) {
+  await this.page.getByText("Save & close").click();
+  await this.page.waitForTimeout(2 * 1000);
+});
+
+When(
+  "Crea {string}",
+  async function (this: IPlaywrightWorld, contenido: string) {
+    switch (contenido) {
+      case "un articulo":
+        await this.page.getByTitle("New post").click();
+        await this.page.waitForURL(
+          `${this.baseUrl}${adminPrefixUrl}/editor/**`
+        );
+        break;
+      case "una pagina":
+        await this.page.getByRole("link", { name: /New page/i }).click();
+        await this.page.waitForURL(
+          `${this.baseUrl}${adminPrefixUrl}/editor/**`
+        );
+        break;
+      default:
+        throw new Error(`No se reconoce el contenido ${contenido}`);
+    }
+  }
+);
+
+When(
+  "Con titulo Prueba-{string} y una imagen",
+  async function (this: IPlaywrightWorld, contenido: string) {
+    const titlePlaceholder =
+      contenido.charAt(0).toUpperCase() + contenido.slice(1);
+    tituloContenido = `Prueba-${titlePlaceholder}`;
+    await this.page
+      .getByPlaceholder(`${titlePlaceholder} title`)
+      .fill(tituloContenido);
+
+    const fileChooserPromise = this.page.waitForEvent("filechooser");
+    const img = this.dataGenerator.number.int({ min: 1, max: 3 });
+    await this.page.getByRole("button", { name: "Add feature image" }).click();
+    const fileChooser = await fileChooserPromise;
+    await fileChooser.setFiles(
+      path.join(__dirname, "..", "imgs", `${img}.jpeg`)
+    );
+    await this.page.waitForTimeout(5 * 1000);
+  }
+);
+
+When("Publica el contenido", async function (this: IPlaywrightWorld) {
+  await this.page.getByRole("button", { name: /Publish/i }).click();
+
+  await this.page
+    .getByRole("button", { name: /Continue, final review/i })
+    .click();
+  await this.page
+    .locator('button[data-test-button="confirm-publish"]')
+    .click({ force: true });
+});
 
 /** *********************
  * THEN
@@ -130,5 +263,55 @@ Then(
     await expect(
       this.page.getByText("Invitation successfully sent to")
     ).toBeVisible();
+  }
+);
+
+Then(
+  "Valida que se haya modificado la metadata de la página",
+  async function (this: IPlaywrightWorld) {
+    const box = await this.page.locator('div[data-testid="metadata"]');
+    await box.getByText("Edit").click();
+    await this.page.waitForTimeout(2 * 1000);
+    expect(nombreMetadata).toBeDefined();
+    await expect(this.page.getByText(nombreMetadata!).first()).toBeVisible();
+  }
+);
+
+Then(
+  "Verificar que las redes sociales esten bien configuradas",
+  async function (this: IPlaywrightWorld) {
+    const box = await this.page.locator('div[data-testid="social-accounts"]');
+    await expect(
+      this.page.getByText(/https?:\/\/(?:www\.)?facebook\.com(\/.*)/)
+    ).toBeVisible();
+    await expect(
+      this.page.getByText(/https?:\/\/(?:www\.)?twitter\.com(\/.*)/)
+    ).toBeVisible();
+  }
+);
+
+Then(
+  "Encuentra un usuario con ese nombre",
+  async function (this: IPlaywrightWorld) {
+    await expect(
+      this.page.locator('tr[data-test-list="members-list-item"]')
+    ).toHaveCount(1);
+  }
+);
+
+Then(
+  "Puede ver los cambios en el perfil correctamente",
+  async function (this: IPlaywrightWorld) {
+    await expect(await this.page.getByLabel("Full name").inputValue()).toBe(
+      nombrePerfil
+    );
+  }
+);
+
+Then(
+  "Verifica que el contenido se visualiza de manera correcta",
+  async function (this: IPlaywrightWorld) {
+    await this.page.locator("a.gh-post-bookmark-wrapper").click();
+    await expect(this.page.getByTitle(tituloContenido!)).toBeDefined();
   }
 );
