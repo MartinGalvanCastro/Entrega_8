@@ -1,7 +1,15 @@
-import { Given, When, Then, After } from "@cucumber/cucumber";
+import {
+  Given,
+  When,
+  Then,
+  After,
+  ITestCaseHookParameter,
+  Before,
+} from "@cucumber/cucumber";
 import { expect } from "@playwright/test";
 import { IPlaywrightWorld, Browsers } from "../world";
 import path from "path";
+import { tomarPantallazo, resetCounter } from "../util";
 
 //Variables
 const adminPrefixUrl = "/ghost/#";
@@ -9,11 +17,21 @@ let esTemaClaro: boolean | undefined;
 let tituloContenido: string | undefined;
 let nombreMetadata: string | undefined;
 let nombrePerfil: string | undefined;
+let scenarioName: string;
+let imgName: string;
 
 /** ************************
  * HOOKS
  * **************************/
+
+Before(function ({ pickle }: ITestCaseHookParameter) {
+  const tags = pickle.tags.map((tag) => tag.name);
+  const scenario = tags[0];
+  scenarioName = `${scenario}-`;
+});
+
 After(() => {
+  resetCounter();
   tituloContenido = undefined;
   esTemaClaro = undefined;
   nombreMetadata = undefined;
@@ -28,6 +46,8 @@ Given(
   "Se esta usando el navegador {string}",
   async function (this: IPlaywrightWorld, navegador: Browsers) {
     await this.init(navegador);
+    imgName = navegador === "chrome" ? "Before" : "After";
+    scenarioName += navegador;
   }
 );
 
@@ -43,25 +63,33 @@ Given("Un usuario administrador", async function (this: IPlaywrightWorld) {
 When("Inicia sesion", async function (this: IPlaywrightWorld) {
   await this.page.goto("/ghost");
   await this.page.waitForURL(`${this.baseUrl}${adminPrefixUrl}/signin`);
+  await tomarPantallazo(this, imgName, scenarioName);
   await this.page.getByLabel("Email address").fill(this.adminUser!);
   await this.page.getByLabel("Password").fill(this.adminPassword!);
+  await tomarPantallazo(this, imgName, scenarioName);
   await this.page.getByRole("button", { name: /Sign in/i }).click();
+  await tomarPantallazo(this, imgName, scenarioName);
   await this.page.waitForURL(`${this.baseUrl}/ghost/#/dashboard`);
+  await tomarPantallazo(this, imgName, scenarioName);
 });
 
 When("Cambia el tema", async function (this: IPlaywrightWorld) {
+  await tomarPantallazo(this, imgName, scenarioName);
   const disabledAtributo = await this.page
     .locator("head link#dark-styles")
     .getAttribute("disabled");
   esTemaClaro = disabledAtributo !== null;
   await this.page.locator("div.nightshift-toggle").click();
   await this.page.waitForTimeout(1 * 1000);
+  await tomarPantallazo(this, imgName, scenarioName);
 });
 
 When(
   "Navega al menu de {string}",
   async function (this: IPlaywrightWorld, menu: string) {
+    await tomarPantallazo(this, imgName, scenarioName);
     if (menu === "user-profile") {
+      await tomarPantallazo(this, imgName, scenarioName);
       await this.page.locator("div.gh-user-avatar").click();
       await this.page.waitForTimeout(500);
     }
@@ -69,6 +97,7 @@ When(
       menu += "s";
     }
     await this.page.locator(`a[data-test-nav="${menu}"]`).click();
+    await tomarPantallazo(this, imgName, scenarioName);
   }
 );
 
@@ -111,14 +140,19 @@ When(
       });
     });
 
+    await tomarPantallazo(this, imgName, scenarioName);
     await this.page
       .getByRole("button", { name: "Invite people", exact: true })
       .click();
+    await tomarPantallazo(this, imgName, scenarioName);
 
     await modal.getByLabel("Email address").fill(email);
 
+    await tomarPantallazo(this, imgName, scenarioName);
     await modal.getByText(rol, { exact: true }).click();
+    await tomarPantallazo(this, imgName, scenarioName);
     await modal.getByRole("button", { name: "Send invitation now" }).click();
+    await tomarPantallazo(this, imgName, scenarioName);
   }
 );
 
@@ -126,35 +160,46 @@ When("Edita metadata de la pagina", async function (this: IPlaywrightWorld) {
   nombreMetadata = this.dataGenerator.lorem.word();
   const box = await this.page.locator('div[data-testid="metadata"]');
   await box.getByText("Edit").click();
+  await tomarPantallazo(this, imgName, scenarioName);
   await this.page.keyboard.press("Control+A");
   await this.page.keyboard.type(nombreMetadata);
+  await tomarPantallazo(this, imgName, scenarioName);
   await this.page.getByRole("button", { name: "save" }).click();
+  await tomarPantallazo(this, imgName, scenarioName);
 });
 
 When(
   "Filtra los usuarios por un nombre",
   async function (this: IPlaywrightWorld) {
     const correo = "Filtered Member";
+    await tomarPantallazo(this, imgName, scenarioName);
     await this.page
       .locator('input[data-test-input="members-search"]')
       .fill(correo);
+    await tomarPantallazo(this, imgName, scenarioName);
   }
 );
 
 When("Navega al dashboard", async function (this: IPlaywrightWorld) {
+  await tomarPantallazo(this, imgName, scenarioName);
   await this.page.goto(adminPrefixUrl);
+  await this.page.waitForURL(`${this.baseUrl}/ghost/#/dashboard`);
+  await tomarPantallazo(this, imgName, scenarioName);
 });
 
 When(
   "Actualiza su informacion del perfil",
   async function (this: IPlaywrightWorld) {
+    await tomarPantallazo(this, imgName, scenarioName);
     nombrePerfil = this.dataGenerator.person.fullName();
     await this.page.getByLabel("Full name").fill(nombrePerfil);
+    await tomarPantallazo(this, imgName, scenarioName);
   }
 );
 
 When("Sube una cover image", async function (this: IPlaywrightWorld) {
   const fileChooserPromise = this.page.waitForEvent("filechooser");
+  await tomarPantallazo(this, imgName, scenarioName);
   try {
     await this.page
       .getByText("Upload cover image")
@@ -168,21 +213,24 @@ When("Sube una cover image", async function (this: IPlaywrightWorld) {
       .getByText("Upload cover image")
       .click({ timeout: 2 * 1000 });
   }
-
   const fileChooser = await fileChooserPromise;
   const img = this.dataGenerator.number.int({ min: 1, max: 3 });
   await fileChooser.setFiles(path.join(__dirname, "..", "imgs", `${img}.jpeg`));
   await this.page.waitForTimeout(5 * 1000);
+  await tomarPantallazo(this, imgName, scenarioName);
 });
 
 When("Guarda los cambios del perfil", async function (this: IPlaywrightWorld) {
+  await tomarPantallazo(this, imgName, scenarioName);
   await this.page.getByText("Save & close").click();
+  await tomarPantallazo(this, imgName, scenarioName);
   await this.page.waitForTimeout(2 * 1000);
 });
 
 When(
   "Crea {string}",
   async function (this: IPlaywrightWorld, contenido: string) {
+    await tomarPantallazo(this, imgName, scenarioName);
     switch (contenido) {
       case "un articulo":
         await this.page.getByTitle("New post").click();
@@ -199,6 +247,7 @@ When(
       default:
         throw new Error(`No se reconoce el contenido ${contenido}`);
     }
+    await tomarPantallazo(this, imgName, scenarioName);
   }
 );
 
@@ -207,31 +256,38 @@ When(
   async function (this: IPlaywrightWorld, contenido: string) {
     const titlePlaceholder =
       contenido.charAt(0).toUpperCase() + contenido.slice(1);
+    await tomarPantallazo(this, imgName, scenarioName);
     tituloContenido = `Prueba-${titlePlaceholder}`;
     await this.page
       .getByPlaceholder(`${titlePlaceholder} title`)
       .fill(tituloContenido);
+    await tomarPantallazo(this, imgName, scenarioName);
 
     const fileChooserPromise = this.page.waitForEvent("filechooser");
     const img = this.dataGenerator.number.int({ min: 1, max: 3 });
+    await tomarPantallazo(this, imgName, scenarioName);
     await this.page.getByRole("button", { name: "Add feature image" }).click();
     const fileChooser = await fileChooserPromise;
     await fileChooser.setFiles(
       path.join(__dirname, "..", "imgs", `${img}.jpeg`)
     );
     await this.page.waitForTimeout(5 * 1000);
+    await tomarPantallazo(this, imgName, scenarioName);
   }
 );
 
 When("Publica el contenido", async function (this: IPlaywrightWorld) {
+  await tomarPantallazo(this, imgName, scenarioName);
   await this.page.getByRole("button", { name: /Publish/i }).click();
-
+  await tomarPantallazo(this, imgName, scenarioName);
   await this.page
     .getByRole("button", { name: /Continue, final review/i })
     .click();
+  await tomarPantallazo(this, imgName, scenarioName);
   await this.page
     .locator('button[data-test-button="confirm-publish"]')
     .click({ force: true });
+  await tomarPantallazo(this, imgName, scenarioName);
 });
 
 /** *********************
