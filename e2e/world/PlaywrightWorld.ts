@@ -5,14 +5,12 @@ import {
   setDefaultTimeout,
   After,
 } from "@cucumber/cucumber";
-import { chromium, firefox, webkit, devices } from "@playwright/test";
+import { chromium } from "@playwright/test";
 import type {
   Browser,
   BrowserContext,
-  BrowserType,
   Page,
   PlaywrightTestOptions,
-  ViewportSize,
 } from "@playwright/test";
 import "dotenv/config";
 import { Faker, faker } from "@faker-js/faker";
@@ -68,6 +66,7 @@ class PlaywrightWorld extends World implements IPlaywrightWorld {
     this.browser = await chromium.launch({
       headless: headless,
       channel: browser,
+      timeout: 40 * 1000,
     });
     this.browserContext = await this.browser.newContext({
       baseURL: this.baseUrl,

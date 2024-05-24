@@ -1,8 +1,7 @@
 Feature: Escearios Regresion
 
     @ES01
-    # 4 Escenarios
-    Scenario Outline: Inicio Sesion - Cambiar Tema - Invita a un miembro del staff
+    Scenario Outline: Inicio Sesion - Cambiar Tema - Invita a un miembro del staff como Contributor
         Given Se esta usando el navegador '<navegador>'
         And Un usuario administrador
         When Inicia sesion
@@ -10,21 +9,67 @@ Feature: Escearios Regresion
         When Cambia el tema
         Then Visualiza que el tema cambio
         When Navega al menu de 'settings'
-        And Invita un miembro del staff como '<rol>'
+        And Invita un miembro del staff como 'Contributor'
         Then Verifica que la invitacion se envio correctamente
 
         Examples:
-            | navegador | rol           |
-            | chrome    | Contributor   |
-            | chrome    | Author        |
-            | chrome    | Editor        |
-            | chrome    | Administrator |
-            | msedge    | Author        |
-            | msedge    | Editor        |
-            | msedge    | Administrator |
-            | msedge    | Contributor   |
+            | navegador |
+            | chrome    |
+            | msedge    |
 
     @ES02
+    Scenario Outline: Inicio Sesion - Cambiar Tema - Invita a un miembro del staff como Author
+        Given Se esta usando el navegador '<navegador>'
+        And Un usuario administrador
+        When Inicia sesion
+        Then Visualiza el dashboard de administrador
+        When Cambia el tema
+        Then Visualiza que el tema cambio
+        When Navega al menu de 'settings'
+        And Invita un miembro del staff como 'Author'
+        Then Verifica que la invitacion se envio correctamente
+
+        Examples:
+            | navegador |
+            | chrome    |
+            | msedge    |
+
+    @ES03
+    Scenario Outline: Inicio Sesion - Cambiar Tema - Invita a un miembro del staff como Editor
+        Given Se esta usando el navegador '<navegador>'
+        And Un usuario administrador
+        When Inicia sesion
+        Then Visualiza el dashboard de administrador
+        When Cambia el tema
+        Then Visualiza que el tema cambio
+        When Navega al menu de 'settings'
+        And Invita un miembro del staff como 'Editor'
+        Then Verifica que la invitacion se envio correctamente
+
+        Examples:
+            | navegador |
+            | chrome    |
+            | msedge    |
+
+    @ES04
+    Scenario Outline: Inicio Sesion - Cambiar Tema - Invita a un miembro del staff como Administrator
+        Given Se esta usando el navegador '<navegador>'
+        And Un usuario administrador
+        When Inicia sesion
+        Then Visualiza el dashboard de administrador
+        When Cambia el tema
+        Then Visualiza que el tema cambio
+        When Navega al menu de 'settings'
+        And Invita un miembro del staff como 'Administrator'
+        Then Verifica que la invitacion se envio correctamente
+
+        Examples:
+            | navegador |
+            | chrome    |
+            | msedge    |
+
+
+    @ES05
     # 1 Escenario
     Scenario Outline: Iniciar sesión, crear metadata para google, validar que la etiqueta esté bien creada
         Given Se esta usando el navegador '<navegador>'
@@ -41,7 +86,7 @@ Feature: Escearios Regresion
             | msedge    |
 
 
-    @ES03
+    @ES06
     # 1 Escenario
     Scenario Outline: Inicio sesión, ingreso la información de redes sociales, visualizar que las redes sociales esten bien configuradas
         Given Se esta usando el navegador '<navegador>'
@@ -56,7 +101,7 @@ Feature: Escearios Regresion
             | chrome    |
             | msedge    |
 
-    @ES04
+    @ES07
     # 1 Escenario
     Scenario Outline: Inicio sesion, busca un miembro por un filtro
         Given Se esta usando el navegador '<navegador>'
@@ -72,7 +117,7 @@ Feature: Escearios Regresion
             | chrome    |
             | msedge    |
 
-    @ES05
+    @ES08
     # 1 Escenario
     Scenario Outline: Inicio sesion, Cambia Tema, Modifica informacion del perfil, sube una cover image
         Given Se esta usando el navegador '<navegador>'
@@ -94,22 +139,37 @@ Feature: Escearios Regresion
             | chrome    |
             | msedge    |
 
-    @ES06
-    # 2 Escenarios
-    Scenario Outline: Inicio sesion, Crea un contenido con una imagen y un titulo, lo publica
+    @ES09
+    Scenario Outline: Inicio sesion, Crea un articulo con una imagen y un titulo, lo publica
         Given Se esta usando el navegador '<navegador>'
         And Un usuario administrador
         When Inicia sesion
         Then Visualiza el dashboard de administrador
-        When Navega al menu de '<menu-contenido>'
-        And Crea '<contenido>'
-        And Con titulo Prueba-'<menu-contenido>' y una imagen
+        When Navega al menu de 'posts'
+        And Crea 'un articulo'
+        And Con titulo Prueba-'post' y una imagen
         And Publica el contenido
         Then Verifica que el contenido se visualiza de manera correcta
 
         Examples:
-            | navegador | menu-contenido | contenido   |
-            | chrome    | post           | un articulo |
-            | chrome    | page           | una pagina  |
-            | msedge    | post           | un articulo |
-            | msedge    | page           | una pagina  |
+            | navegador |
+            | chrome    |
+            | msedge    |
+
+    @ES10
+    Scenario Outline: Inicio sesion, Crea una pagina con una imagen y un titulo, lo publica
+        Given Se esta usando el navegador '<navegador>'
+        And Un usuario administrador
+        When Inicia sesion
+        Then Visualiza el dashboard de administrador
+        When Navega al menu de 'pages'
+        And Crea 'una pagina'
+        And Con titulo Prueba-'page' y una imagen
+        And Publica el contenido
+        Then Verifica que el contenido se visualiza de manera correcta
+
+        Examples:
+            | navegador |
+            | chrome    |
+            | msedge    |
+
