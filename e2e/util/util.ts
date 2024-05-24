@@ -8,9 +8,9 @@ export const tomarPantallazo = async (
   imageName: string,
   folder: string
 ) => {
-  const screenshotPath = `../screenshots/${folder}/${imageName}-${stepCounter}.png`;
-  if (!fs.existsSync(`../screenshots/${folder}`)) {
-    fs.mkdirSync(`../screenshots/${folder}`, { recursive: true });
+  const screenshotPath = `./screenshots/${folder}/${imageName}-${stepCounter}.png`;
+  if (!fs.existsSync(`./screenshots/${folder}`)) {
+    fs.mkdirSync(`./screenshots/${folder}`, { recursive: true });
   }
   await world.page.screenshot({ path: screenshotPath });
   stepCounter += 1;

@@ -16,6 +16,9 @@
   },
   "scripts": {
     "cucumber": "cucumber-js",
-    "cucumber:headed": "HEAD=1 cucumber-js"
+    "cucumber:headed": "HEAD=1 cucumber-js",
+    "approve": "backstop approve --config=\"backstop-test.js\"",
+    "set_ref": "backstop test --config=\"backstop-test.js\"",
+    "run_reg": "backstop test --config=\"backstop-reg.js\""
   }
 }
