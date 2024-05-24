@@ -29,8 +29,7 @@ export type Browsers = "chrome" | "firefox" | "safari";
 export interface IPlaywrightWorld extends World {
   page: Page;
   baseUrl: string;
-  browsers: Record<Browsers, BrowserType>;
-  selectedBrowser: Browsers;
+  selectedBrowser: string;
   adminUser?: string;
   adminPassword?: string;
   playwrightOptions?: PlaywrightTestOptions;
@@ -45,11 +44,6 @@ export interface IPlaywrightWorld extends World {
 class PlaywrightWorld extends World implements IPlaywrightWorld {
   debug = false;
   baseUrl = "";
-  browsers: Record<Browsers, BrowserType> = {
-    chrome: chromium,
-    firefox: firefox,
-    safari: webkit,
-  };
   browser!: Browser;
   browserContext!: BrowserContext;
   page!: Page;
@@ -71,8 +65,9 @@ class PlaywrightWorld extends World implements IPlaywrightWorld {
     this.selectedBrowser = browser;
     this.baseUrl = "https://ghost-al42.onrender.com";
     const headless = process.env.HEAD !== "1";
-    this.browser = await this.browsers[browser].launch({
+    this.browser = await chromium.launch({
       headless: headless,
+      channel: browser,
     });
     this.browserContext = await this.browser.newContext({
       baseURL: this.baseUrl,

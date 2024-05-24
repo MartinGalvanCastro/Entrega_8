@@ -7,9 +7,9 @@ const adminPrefixUrl = "/ghost/#";
 let esTemaClaro: boolean | undefined;
 let tituloContenido: string | undefined;
 
-/** ***************
+/** *********************
  * GIVEN
- * ***************/
+ * *********************/
 
 Given(
   "Se esta usando el navegador {string}",
@@ -23,9 +23,9 @@ Given("Un usuario administrador", async function (this: IPlaywrightWorld) {
   this.adminPassword = process.env.ADMIN_PASS!;
 });
 
-/** ***************
+/** *********************
  * WHEN
- * ***************/
+ * *********************/
 
 When("Inicia sesion", async function (this: IPlaywrightWorld) {
   await this.page.goto("/ghost");
@@ -58,7 +58,6 @@ When(
     this: IPlaywrightWorld,
     rol: "Contributor" | "Author" | "Editor" | "Administrator"
   ) {
-    await this.page.waitForTimeout(10 * 1000);
     const email = `${rol}-${this.dataGenerator.number.int({
       min: 100,
       max: 200,
@@ -72,8 +71,6 @@ When(
     const modal = await this.page.locator(
       'section[data-testid="invite-user-modal"]'
     );
-
-    console.log(email);
 
     await this.page.route("/ghost/api/admin/invites/", async (route) => {
       await route.fulfill({
@@ -104,9 +101,9 @@ When(
   }
 );
 
-/** ***************
+/** *********************
  * THEN
- * ***************/
+ * *********************/
 
 Then(
   "Visualiza el dashboard de administrador",

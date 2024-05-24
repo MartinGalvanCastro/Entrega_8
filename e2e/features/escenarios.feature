@@ -18,12 +18,9 @@ Feature: Escearios Regresion
             | chrome    | Author        |
             | chrome    | Editor        |
             | chrome    | Administrator |
-            | firefox   | Contributor   |
-            | firefox   | Author        |
-            | firefox   | Editor        |
-            | firefox   | Administrator |
-            | webkit    | Contributor   |
-            | webkit    | Author        |
-            | webkit    | Editor        |
-            | webkit    | Administrator |
+            | msedge    | Author        |
+            | msedge    | Editor        |
+            | msedge    | Administrator |
+            | msedge    | Contributor   |
+
 
