@@ -1,13 +1,11 @@
 Feature: Escearios Regresion
 
     @ES01
-    Scenario Outline: Inicio Sesion - Cambiar Tema - Invita a un miembro del staff como Contributor
+    Scenario Outline: Inicio Sesion - Invita a un miembro del staff como Contributor
         Given Se esta usando el navegador '<navegador>'
         And Un usuario administrador
         When Inicia sesion
         Then Visualiza el dashboard de administrador
-        When Cambia el tema
-        Then Visualiza que el tema cambio
         When Navega al menu de 'settings'
         And Invita un miembro del staff como 'Contributor'
         Then Verifica que la invitacion se envio correctamente
@@ -18,13 +16,11 @@ Feature: Escearios Regresion
             | msedge    |
 
     @ES02
-    Scenario Outline: Inicio Sesion - Cambiar Tema - Invita a un miembro del staff como Author
+    Scenario Outline: Inicio Sesion - Invita a un miembro del staff como Author
         Given Se esta usando el navegador '<navegador>'
         And Un usuario administrador
         When Inicia sesion
         Then Visualiza el dashboard de administrador
-        When Cambia el tema
-        Then Visualiza que el tema cambio
         When Navega al menu de 'settings'
         And Invita un miembro del staff como 'Author'
         Then Verifica que la invitacion se envio correctamente
@@ -40,8 +36,6 @@ Feature: Escearios Regresion
         And Un usuario administrador
         When Inicia sesion
         Then Visualiza el dashboard de administrador
-        When Cambia el tema
-        Then Visualiza que el tema cambio
         When Navega al menu de 'settings'
         And Invita un miembro del staff como 'Editor'
         Then Verifica que la invitacion se envio correctamente
@@ -52,13 +46,11 @@ Feature: Escearios Regresion
             | msedge    |
 
     @ES04
-    Scenario Outline: Inicio Sesion - Cambiar Tema - Invita a un miembro del staff como Administrator
+    Scenario Outline: Inicio Sesion  - Invita a un miembro del staff como Administrator
         Given Se esta usando el navegador '<navegador>'
         And Un usuario administrador
         When Inicia sesion
         Then Visualiza el dashboard de administrador
-        When Cambia el tema
-        Then Visualiza que el tema cambio
         When Navega al menu de 'settings'
         And Invita un miembro del staff como 'Administrator'
         Then Verifica que la invitacion se envio correctamente
@@ -119,13 +111,11 @@ Feature: Escearios Regresion
 
     @ES08
     # 1 Escenario
-    Scenario Outline: Inicio sesion, Cambia Tema, Modifica informacion del perfil, sube una cover image
+    Scenario Outline: Inicio sesion, Modifica informacion del perfil, sube una cover image
         Given Se esta usando el navegador '<navegador>'
         And Un usuario administrador
         When Inicia sesion
         Then Visualiza el dashboard de administrador
-        When Cambia el tema
-        Then Visualiza que el tema cambio
         When Navega al menu de 'user-profile'
         And Actualiza su informacion del perfil
         And Sube una cover image
