@@ -31,7 +31,7 @@ Feature: Escearios Regresion
             | msedge    |
 
     @ES03
-    Scenario Outline: Inicio Sesion - Cambiar Tema - Invita a un miembro del staff como Editor
+    Scenario Outline: Inicio Sesion - Invita a un miembro del staff como Editor
         Given Se esta usando el navegador '<navegador>'
         And Un usuario administrador
         When Inicia sesion

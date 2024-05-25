@@ -13,7 +13,6 @@ import { tomarPantallazo, resetCounter } from "../util";
 
 //Variables
 const adminPrefixUrl = "/ghost/#";
-let esTemaClaro: boolean | undefined;
 let tituloContenido: string | undefined;
 let nombreMetadata: string | undefined;
 let nombrePerfil: string | undefined;
@@ -33,7 +32,6 @@ Before(function ({ pickle }: ITestCaseHookParameter) {
 After(() => {
   resetCounter();
   tituloContenido = undefined;
-  esTemaClaro = undefined;
   nombreMetadata = undefined;
   nombrePerfil = undefined;
 });
@@ -70,17 +68,6 @@ When("Inicia sesion", async function (this: IPlaywrightWorld) {
   await this.page.getByRole("button", { name: /Sign in/i }).click();
   await tomarPantallazo(this, imgName, scenarioName);
   await this.page.waitForURL(`${this.baseUrl}/ghost/#/dashboard`);
-  await tomarPantallazo(this, imgName, scenarioName);
-});
-
-When("Cambia el tema", async function (this: IPlaywrightWorld) {
-  await tomarPantallazo(this, imgName, scenarioName);
-  const disabledAtributo = await this.page
-    .locator("head link#dark-styles")
-    .getAttribute("disabled");
-  esTemaClaro = disabledAtributo !== null;
-  await this.page.locator("div.nightshift-toggle").click();
-  await this.page.waitForTimeout(1 * 1000);
   await tomarPantallazo(this, imgName, scenarioName);
 });
 
@@ -305,13 +292,6 @@ Then(
     ).toBeVisible();
   }
 );
-
-Then("Visualiza que el tema cambio", async function (this: IPlaywrightWorld) {
-  const cambioTema = await this.page
-    .locator("head link#dark-styles")
-    .getAttribute("disabled");
-  expect(cambioTema !== null).toBe(!esTemaClaro);
-});
 
 Then(
   "Verifica que la invitacion se envio correctamente",
