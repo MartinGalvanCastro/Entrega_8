@@ -1,6 +1,6 @@
 # Pruebas Semana 1 Nueva Estrategia de Pruebas
 ---
-En la Wiki se tiene una copia de los entregables requeridos
+En la Wiki se tiene una copia de los entregables requeridos y la retroalimentacion
 ---
 ## Requerimientos:
 - Node: 20.12.2
